@@ -48,7 +48,8 @@ public class index {
                         terminosIndependientes[i] = sc.nextDouble();
                     }
 
-                    maximizar(numVariables, numRestricciones, coeficientesObjetivo, coeficientesRestricciones,terminosIndependientes);
+                    maximizar(numVariables, numRestricciones, coeficientesObjetivo, coeficientesRestricciones,
+                            terminosIndependientes);
                     break;
                 }
 
@@ -70,12 +71,12 @@ public class index {
     }
 
     // Metodo para maximizar
-    public static void maximizar(int numVariables, int numRestricciones, double[] coeficientesObjetivo, double[][] coeficientesRestricciones, double[] terminosIndependientes) {
-        //Calculo del numero de columnas y filas de la tabla simplex
+    public static void maximizar(int numVariables, int numRestricciones, double[] coeficientesObjetivo,
+            double[][] coeficientesRestricciones, double[] terminosIndependientes) {
+        // Calculo del numero de columnas y filas de la tabla simplex
         int numColumnas = numVariables + numRestricciones + 1; // +1 para la columna de los terminos independientes
         int numFilas = numRestricciones + 1; // +1 para la fila de la funcion objetivo
         double[][] tablaSimplex = new double[numFilas][numColumnas];// Tabla simplex
-        
 
         // Llenado de la tabla simplex
         for (int i = 0; i < numRestricciones; i++) {
@@ -90,7 +91,13 @@ public class index {
         for (int j = 0; j < numVariables; j++) {
             tablaSimplex[numFilas - 1][j] = -coeficientesObjetivo[j]; // Coeficientes de la funcion objetivo
         }
+        // varables de holgura que inician en 0
+        for (int i = 0; i < numVariables; i++) {
+            tablaSimplex[numRestricciones][i] = 0;
+        }
+        tablaSimplex[numRestricciones][numColumnas - 1] = 0; // Termino independiente de la funcion objetivo
 
+        // Algoritmo simplex
 
     }
 
