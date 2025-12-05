@@ -98,7 +98,7 @@ public class index {
         tablaSimplex[numRestricciones][numColumnas - 1] = 0; // Termino independiente de la funcion objetivo
 
         // Algoritmo simplex
-
+       
     }
 
     // Metodo para minimizar
@@ -106,4 +106,17 @@ public class index {
 
     }
 
+    //metodo para encontrar la columna pivote
+    public static int ColumnaPivote(double[][]tablaSimplex,int numRestricciones, int numColumnas){//metodo para encontrar la columna pivote
+        int columnaPivote=-1;//indice de la columna pivote
+        double valorMinimo=0;
+
+        for(int j=0;j<numColumnas-1;j++){//recorre las columnas menos la de terminos independientes
+            if(tablaSimplex[numRestricciones][j]<valorMinimo){//si el valor es menor al minimo actual
+                valorMinimo=tablaSimplex[numRestricciones][j];//actualiza el valor minimo
+                columnaPivote=j;//actualiza el indice de la columna pivote
+            }
+        }
+        return columnaPivote;
+    }
 }
