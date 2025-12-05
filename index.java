@@ -16,7 +16,30 @@ public class index {
 
             switch (opcion) {
                 case 1: {
+                    System.out.println("Ingrese el numero de variables: ");
+                    int numVariables = sc.nextInt();
+                    System.out.println("Ingrese el numero de restricciones: ");
+                    int numRestricciones = sc.nextInt();
 
+                    // Matriz de coeficientes de la funcion objetivo
+                    double[] coeficientesObjetivo = new double[numVariables];
+                    System.out.println("Ingresa los coeficientes de la funcion objetivo: ");
+                    for (int i = 0; i < numVariables; i++) {// Ciclo para llenar los coeficientes de la funcion objetivo
+                        System.out.print("Coeficiente " + (i + 1) + ": ");
+                        coeficientesObjetivo[i] = sc.nextDouble();
+                    }
+                    // Matriz de coeficientes de las restricciones
+                    double[][] coeficientesRestricciones = new double[numRestricciones][numVariables];
+                    // Almacenara los terminos independientes de las restricciones
+                    double[] terminosIndependientes = new double[numRestricciones];
+                    System.out.println("Ingresa los coeficientes de las restricciones (Cx1<= b): ");
+                    // Ciclo para llenar los coeficientes de las restricciones
+                    for (int i = 0; i < numRestricciones; i++) {
+                        System.out.println("Restriccion " + (i + 1) + ": ");
+
+                    }
+
+                    maximizar(numVariables, numRestricciones);
                     break;
                 }
 
@@ -36,4 +59,15 @@ public class index {
         sc.close();
 
     }
+
+    // Metodo para maximizar
+    public static void maximizar(int numVariables, int numRestricciones) {
+
+    }
+
+    // Metodo para minimizar
+    public static void minimizar(int numVariables, int numRestricciones) {
+
+    }
+
 }
