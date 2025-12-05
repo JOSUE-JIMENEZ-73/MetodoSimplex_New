@@ -71,6 +71,26 @@ public class index {
 
     // Metodo para maximizar
     public static void maximizar(int numVariables, int numRestricciones, double[] coeficientesObjetivo, double[][] coeficientesRestricciones, double[] terminosIndependientes) {
+        //Calculo del numero de columnas y filas de la tabla simplex
+        int numColumnas = numVariables + numRestricciones + 1; // +1 para la columna de los terminos independientes
+        int numFilas = numRestricciones + 1; // +1 para la fila de la funcion objetivo
+        double[][] tablaSimplex = new double[numFilas][numColumnas];// Tabla simplex
+        
+
+        // Llenado de la tabla simplex
+        for (int i = 0; i < numRestricciones; i++) {
+            for (int j = 0; j < numVariables; j++) {
+                tablaSimplex[i][j] = coeficientesRestricciones[i][j];// Coeficientes de las restricciones
+            }
+            tablaSimplex[i][numVariables + i] = 1; // Variables de holgura
+            tablaSimplex[i][numColumnas - 1] = terminosIndependientes[i]; // Terminos independientes
+        }
+
+        // Llenado de la fila de la funcion objetivo
+        for (int j = 0; j < numVariables; j++) {
+            tablaSimplex[numFilas - 1][j] = -coeficientesObjetivo[j]; // Coeficientes de la funcion objetivo
+        }
+
 
     }
 
