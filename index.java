@@ -119,4 +119,10 @@ public class index {
         }
         return columnaPivote;
     }
+
+    //Realiza el pivoteo en la tabla simplex
+    public static void pivoteo(double[][]tablaSimplex, int filaPivote, int columnaPivote){
+
+
+    }
 }
