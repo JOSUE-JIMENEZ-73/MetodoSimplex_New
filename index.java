@@ -150,7 +150,21 @@ public class index {
         return columnaPivote;
     }
 
+    public static int FilaPivote(double[][] tablaSimplex, int numRestricciones, int columnas, int columnaPivote) {
+        int filaPivote = -1;
+        double razonMinima = Double.MAX_VALUE;
 
+        for (int i = 0; i < numRestricciones; i++) {
+            if (tablaSimplex[i][columnaPivote] > 0) {
+                double razon = tablaSimplex[i][columnas - 1] / tablaSimplex[i][columnaPivote];
+                if (razon < razonMinima) {
+                    razonMinima = razon;
+                    filaPivote = i;
+                }
+            }
+        }
+        return filaPivote;
+    }
 
     // Realiza el pivoteo en la tabla simplex
     public static void pivoteo(double[][] tablaSimplex, int filaPivote, int columnaPivote) {
