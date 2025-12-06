@@ -92,7 +92,7 @@ public class index {
             tablaSimplex[numFilas - 1][j] = -coeficientesObjetivo[j]; // Coeficientes de la funcion objetivo
         }
         // varables de holgura que inician en 0
-        for (int i = 0; i < numVariables; i++) {
+        for (int i = numVariables; i < numColumnas - 1; i++) {
             tablaSimplex[numRestricciones][i] = 0;
         }
         tablaSimplex[numRestricciones][numColumnas - 1] = 0; // Termino independiente de la funcion objetivo
@@ -104,7 +104,7 @@ public class index {
                 break; // Solucion optima encontrada
             }
 
-            int filaPivote = FilaPivote(tablaSimplex, numRestricciones, columnaPivote);
+            int filaPivote = FilaPivote(tablaSimplex, numRestricciones, numColumnas, columnaPivote);
             if (filaPivote == -1) {
                 System.out.println("Solucion ilimitada");
                 return;
@@ -189,18 +189,22 @@ public class index {
     // verificar si una columna es basica
     public static int ColumnaBasica(double[][] tablaSimplex, int columna, int numRestricciones) {
         int filaConUno = -1;
+        int contadorUnos = 0;
 
         for (int i = 0; i < numRestricciones; i++) {
-            if (Math.abs(tablaSimplex[i][columna]) - 1 < 1e-10) {
-                if (filaConUno != -1) {
-                    return -1; // mas de un 1 en la columna{
-                }
+            double valor = Math.abs(tablaSimplex[i][columna]);
+
+            if (Math.abs(valor - 1.0) < 1e-10) {
+                contadorUnos++;
                 filaConUno = i;
-            } else {
-                return -1; // valor diferente de 0 o 1 en la columna
+            } else if (valor > 1e-10) {
+                // Si hay un valor diferente de 0 o 1, no es columna basica
+                return -1;
             }
         }
-        return filaConUno;
+
+        // Solo es basica si hay exactamente un 1 y el resto son 0
+        return (contadorUnos == 1) ? filaConUno : -1;
     }
 
 }
