@@ -54,6 +54,37 @@ public class index {
                 }
 
                 case 2: {
+                    System.out.print("Ingrese el numero de variables: ");
+                    int numVariables = sc.nextInt();
+                    System.out.print("Ingrese el numero de restricciones: ");
+                    int numRestricciones = sc.nextInt();
+                    System.out.println(" ");
+                    double[] coeficientesObjetivo = new double[numVariables];
+
+                    System.out.println("\nIngrese los coeficientes de la funcion objetivo: ");
+                    for (int i = 0; i < numVariables; i++) {
+                        System.out.print("Coeficiente X" + (i + 1) + ": ");
+                        coeficientesObjetivo[i] = sc.nextDouble();
+                    }
+
+                    double[][] coeficientesRestricciones = new double[numRestricciones][numVariables];
+                    double[] terminosIndependientes = new double[numRestricciones];
+
+                    System.out.println("\nIngrese los coeficientes de las restricciones (AX >= b):");
+                    for (int i = 0; i < numRestricciones; i++) {
+                        System.out.println("\nRestriccion " + (i + 1) + ":");
+
+                        for (int j = 0; j < numVariables; j++) {
+                            System.out.print("  Coeficiente X" + (j + 1) + ": ");
+                            coeficientesRestricciones[i][j] = sc.nextDouble();
+                        }
+
+                        System.out.print("  Valor b" + (i + 1) + ": ");
+                        terminosIndependientes[i] = sc.nextDouble();
+                    }
+
+                    minimizar(numVariables, numRestricciones, coeficientesObjetivo, coeficientesRestricciones,
+                            terminosIndependientes);
 
                     break;
                 }
@@ -132,8 +163,95 @@ public class index {
     }
 
     // Metodo para minimizar
-    public static void minimizar(int numVariables, int numRestricciones) {
+    public static void minimizar(int numVariables, int numRestricciones, double[] coeficientesObjetivo,
+            double[][] coeficientesRestricciones, double[] terminosIndependientes) {
+        // Convertir el problema de minimizacion a maximizacion
+        for (int i = 0; i < coeficientesObjetivo.length; i++) {
+            coeficientesObjetivo[i] = -coeficientesObjetivo[i];// Negar los coeficientes de la funcion objetivo
+        }
 
+        int numExceso = numRestricciones;// Numero de variables de exceso
+        int numArtificiales = numRestricciones;// Numero de variables artificiales
+
+        int totalVariablesExtra = numExceso + numArtificiales;
+        int columnas = numVariables + totalVariablesExtra + 1;
+        int filas = numRestricciones + 1;
+        double[][] tablaSimplex = new double[filas][columnas];
+
+        
+        final double M = 1000000;
+
+        int colExceso = numVariables;// Indice inicial de las variables de exceso
+        int colArtificial = numVariables + numExceso;// Indice inicial de las variables artificiales
+
+        for (int i = 0; i < numRestricciones; i++) {// Llenado de la tabla simplex
+            // Copiar coeficientes de las variables originales
+            for (int j = 0; j < numVariables; j++) {
+                tablaSimplex[i][j] = coeficientesRestricciones[i][j];
+            }
+
+            tablaSimplex[i][colExceso + i] = -1;// Variable de exceso
+            tablaSimplex[i][colArtificial + i] = 1;// Variable artificial
+
+            tablaSimplex[i][columnas - 1] = terminosIndependientes[i];// Termino independiente
+        }
+
+        for (int j = 0; j < numVariables; j++) {// Llenado de la fila de la funcion objetivo
+            tablaSimplex[numRestricciones][j] = -coeficientesObjetivo[j];
+        }
+
+        for (int j = 0; j < numExceso; j++) {// Variables de exceso que inician en 0
+            tablaSimplex[numRestricciones][colExceso + j] = 0;
+        }
+
+        for (int j = 0; j < numArtificiales; j++) {// Variables artificiales con penalizacion M
+            tablaSimplex[numRestricciones][colArtificial + j] = M;
+        }
+
+        tablaSimplex[numRestricciones][columnas - 1] = 0;// Termino independiente de la funcion objetivo
+
+        for (int i = 0; i < numRestricciones; i++) {// Ajuste inicial por variables artificiales
+            for (int j = 0; j < columnas; j++) {//
+                tablaSimplex[numRestricciones][j] -= M * tablaSimplex[i][j];// Ajuste de la fila de la funcion objetivo
+            }
+        }
+
+        while (true) {// Algoritmo simplex
+            int columnaPivote = ColumnaPivote(tablaSimplex, numRestricciones, columnas);
+            if (columnaPivote == -1)
+                break;
+
+            int filaPivote = FilaPivote(tablaSimplex, numRestricciones, columnas, columnaPivote);
+            if (filaPivote == -1) {
+                System.out.println("\nEl problema no tiene solucion acotada (ilimitado).");
+                return;
+            }
+
+            pivoteo(tablaSimplex, filaPivote, columnaPivote);
+        }
+
+        for (int j = colArtificial; j < colArtificial + numArtificiales; j++) {// Verificacion de variables artificiales en la solucion
+            int filaBasica = ColumnaBasica(tablaSimplex, j, numRestricciones);//
+            if (filaBasica != -1 && Math.abs(tablaSimplex[filaBasica][columnas - 1]) > 1e-6) {// Si una variable artificial es basica y su valor no es cero
+                System.out.println("\nEl problema no tiene solucion factible.");
+                return;
+            }
+        }
+
+        double[] solucion = new double[numVariables];// Extraccion de la solucion
+        for (int j = 0; j < numVariables; j++) {//
+            int filaBasica = ColumnaBasica(tablaSimplex, j, numRestricciones);// Verifica si la columna es basica
+            if (filaBasica != -1) {// Si es basica, asigna el valor correspondiente
+                solucion[j] = tablaSimplex[filaBasica][columnas - 1];// Valor de la variable
+            }
+        }
+
+        double valorOptimo = -tablaSimplex[numRestricciones][columnas - 1];// Valor optimo de la funcion objetivo (negado)
+        System.out.println("==================RESULTADOS=================");
+        for (int i = 0; i < numVariables; i++) {// Imprime los resultados
+            System.out.println("Valor de X" + (i + 1) + ": " + solucion[i]);
+        }
+        System.out.println("Valor optimo de la funcion objetivo: " + valorOptimo);
     }
 
     // metodo para encontrar la columna pivote
